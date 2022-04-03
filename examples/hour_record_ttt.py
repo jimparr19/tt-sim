@@ -13,7 +13,7 @@ environment = Environment()
 # specify initial rider order
 riders = [
     TeamRider(
-        name="Bradley1", mass=70, cda=0.196, pull_duration=200, position=0, n_riders=3
+        name="Bradley1", mass=70, cda=0.196, pull_duration=200, position=0, n_riders=3, cp=300, w_prime=19800
     ),
     TeamRider(
         name="Bradley2", mass=70, cda=0.196, pull_duration=200, position=1, n_riders=3
@@ -105,15 +105,33 @@ import matplotlib
 matplotlib.use('MACOSX')
 import matplotlib.pyplot as plt
 
-plt.figure()
-plt.plot(riders[0].time, riders[0].power)
-plt.plot(riders[1].time, riders[1].power)
-plt.show()
+# plt.figure()
+# plt.plot(riders[0].time, riders[0].power)
+# plt.plot(riders[1].time, riders[1].power)
+# plt.show()
 
 # a) during lead out solve for distance given time and power for lead rider and solve for power given velcity and time for other riders
 # b) after leadout - solve for distance and power given velocity and time for lead rider
 
 # what happends during gradient - max power needs to be applied rather than match velcoity?
 
+from scipy.interpolate import interp1d
 
+from tt_sim.core.critical_power import CriticalPowerModel
 
+def interpolate(x, y, xi, method="linear"):
+    y_interp = interp1d(x, y, kind=method, fill_value="extrapolate")
+    return y_interp(xi)
+
+plt.figure()
+
+seconds = np.arange(0, int(sim.time[-1] + 1))
+for rider in riders:
+    power_per_second = interpolate(rider.time, rider.power, seconds)
+    cpm = CriticalPowerModel(cp=rider.cp, w_prime=rider.w_prime)
+    w_prime_balance_per_second = cpm.w_prime_balance(power=power_per_second)
+    w_prime_balance = interpolate(seconds, w_prime_balance_per_second, sim.time)
+    plt.plot(sim.time, w_prime_balance, label=rider.name)
+
+plt.legend()
+plt.show()
