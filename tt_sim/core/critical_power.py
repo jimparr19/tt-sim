@@ -31,8 +31,11 @@ class CriticalPowerModel:
         for t, p in enumerate(power):
             w_prime_exp = max(0, p - self.cp)
             w_prime_exp_sum += w_prime_exp * np.exp(t * sampling_rate / tau)
-            w_prime_balance.append(self.w_prime - w_prime_exp_sum * np.exp(-t * sampling_rate / tau))
+            w_prime_balance.append(
+                self.w_prime - w_prime_exp_sum * np.exp(-t * sampling_rate / tau)
+            )
         return w_prime_balance
+
 
 class CriticalPowerModelOpt:
     """
