@@ -65,6 +65,7 @@ class Rider:
     name: str
     mass: float
     cda: float
+    cda_climb: float = 0.3
     cp: float = 380
     w_prime: float = 19800
 
@@ -77,6 +78,7 @@ class TeamRider(Rider):
     pull_duration: float = None
     leading_power: float = None
     rider_distance: float = 0.05 # should be in drag_scaling_factors.keys()
+    dropped: bool = False # set to true if rider gets dropped
 
     def __post_init__(self):
         if self.rider_distance not in drag_scaling_factors.keys():

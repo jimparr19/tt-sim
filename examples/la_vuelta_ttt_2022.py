@@ -4,7 +4,7 @@ from tt_sim.core.rider import TeamRider
 from tt_sim.core.bike import Bike
 from tt_sim.core.wind import Wind
 from tt_sim.core.stage import Stage, read_csv
-from tt_sim.core.simulation import TeamSimulation
+from tt_sim.core.simulation import TeamSimulationWithDropouts
 
 from collections import namedtuple
 
@@ -120,12 +120,14 @@ stage = Stage(stage_data)
 
 if __name__ == "__main__":
     start_time = time.time()
-    sim = TeamSimulation(riders=riders, bike=bike, wind=wind, stage=stage)
+    sim = TeamSimulationWithDropouts(riders=riders, bike=bike, wind=wind, stage=stage)
     sim.solve_velocity_and_time()
     print(f"elapsed time = {time.time() - start_time}")
 
     print(f"race time = {sim.time[-1]}")
     print(f"race time = {sim.time[-1]/60}")
+
+    print(f"n_riders finished = {sum([not rider.dropped for rider in sim.riders])}")
 
 # import matplotlib
 
@@ -133,28 +135,28 @@ if __name__ == "__main__":
 # import matplotlib.pyplot as plt
 
 
-from scipy.interpolate import interp1d
+# from scipy.interpolate import interp1d
 
-from tt_sim.core.critical_power import CriticalPowerModel
+# from tt_sim.core.critical_power import CriticalPowerModel
 
 
-def interpolate(x, y, xi, method="linear"):
-    y_interp = interp1d(x, y, kind=method, fill_value="extrapolate")
-    return y_interp(xi)
+# def interpolate(x, y, xi, method="linear"):
+#     y_interp = interp1d(x, y, kind=method, fill_value="extrapolate")
+#     return y_interp(xi)
 
 
 # plt.figure()
 # plt.subplot(4, 1, 1)
 
-seconds = np.arange(0, int(sim.time[-1] + 1))
-for rider_index, rider in enumerate(riders):
-    power_per_second = interpolate(sim.time, sim.power[rider_index], seconds)
-    cpm = CriticalPowerModel(cp=rider.cp, w_prime=rider.w_prime)
-    w_prime_balance_per_second = cpm.w_prime_balance(power=power_per_second)
-    w_prime_balance = interpolate(seconds, w_prime_balance_per_second, sim.time)
+# seconds = np.arange(0, int(sim.time[-1] + 1))
+# for rider_index, rider in enumerate(riders):
+#     power_per_second = interpolate(sim.time, sim.power[rider_index], seconds)
+#     cpm = CriticalPowerModel(cp=rider.cp, w_prime=rider.w_prime)
+#     w_prime_balance_per_second = cpm.w_prime_balance(power=power_per_second)
+#     w_prime_balance = interpolate(seconds, w_prime_balance_per_second, sim.time)
 #     plt.plot(sim.stage.distance, w_prime_balance, label=rider.name)
 
-print(f"elapsed time = {time.time() - start_time}")
+# print(f"elapsed time = {time.time() - start_time}")
 # plt.legend()
 
 # plt.subplot(4, 1, 2)

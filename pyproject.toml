@@ -15,6 +15,10 @@ pytest = "^5.2"
 black = "^21.9b0"
 matplotlib = "^3.4.3"
 
+[tool.poetry.group.dev.dependencies]
+redis = "^4.5.1"
+python-dotenv = "^0.21.1"
+
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"

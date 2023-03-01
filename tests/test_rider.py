@@ -22,7 +22,7 @@ def test_team_rider_draft_cda():
 
 def test_rider_to_json():
     rider = Rider(name='test', mass=70, cda=0.2, cp=400, w_prime=20000)
-    assert rider.json() == '{"name": "test", "mass": 70, "cda": 0.2, "cp": 400, "w_prime": 20000}'
+    assert rider.json() == '{"name": "test", "mass": 70, "cda": 0.2, "cda_climb": 0.3, "cp": 400, "w_prime": 20000}'
 
 if __name__ == '__main__':
     pytest.main()

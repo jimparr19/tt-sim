@@ -4,7 +4,7 @@ from tt_sim.core.rider import Rider
 from tt_sim.core.bike import Bike
 from tt_sim.core.wind import Wind
 from tt_sim.core.stage import Stage, read_csv
-from tt_sim.core.simulation import Simulation
+from tt_sim.core.simulation import SimulationWithWPrimeBalance
 
 
 rider = Rider(name="Bradley", mass=70, cda=0.196)
@@ -20,7 +20,7 @@ stage = Stage(stage_data)
 power_target = 440
 power = power_target * np.ones(len(stage.distance))
 
-sim = Simulation(rider=rider, bike=bike, wind=wind, stage=stage, power=power)
+sim = SimulationWithWPrimeBalance(rider=rider, bike=bike, wind=wind, stage=stage, power=power)
 sim.solve_velocity_and_time()
 
 print(sim.time[-1])
@@ -41,6 +41,8 @@ cpm = CriticalPowerModel(cp=rider.cp, w_prime=rider.w_prime)
 w_prime_balance_per_second = cpm.w_prime_balance(power=power_per_second)
 w_prime_balance = interpolate(seconds, w_prime_balance_per_second, sim.time)
 print("min w_prime = {}".format(min(w_prime_balance)))
+
+print("min w_prime = {}".format(min(sim.w_prime_balance)))
 
 
 import matplotlib

@@ -5,7 +5,7 @@ from tt_sim.core.rider import Rider, TeamRider
 from tt_sim.core.bike import Bike
 from tt_sim.core.wind import Wind
 from tt_sim.core.stage import Stage, get_default_stage
-from tt_sim.core.simulation import TeamSimulation, Environment, get_purmutations
+from tt_sim.core.simulation import TeamSimulationWithDropouts, Environment, get_purmutations
 
 from collections import deque
 
@@ -17,7 +17,7 @@ riders = [
         name="Bradley1",
         mass=70,
         cda=0.196,
-        pull_duration=20,
+        pull_duration=50,
         leading_power = 380,
         cp=300,
         w_prime=19800,
@@ -49,7 +49,7 @@ stage = Stage(get_default_stage())
 for rider in riders:
     rider.n_riders = len(riders)
 
-sim = TeamSimulation(riders=riders, bike=bike, wind=wind, stage=stage)
+sim = TeamSimulationWithDropouts(riders=riders, bike=bike, wind=wind, stage=stage)
 sim.solve_velocity_and_time()
 
 import matplotlib.pylab as plt
@@ -66,13 +66,29 @@ def interpolate(x, y, xi, method="linear"):
 
 plt.figure()
 
-seconds = np.arange(0, int(sim.time[-1] + 1))
+plt.subplot(3, 1, 1)
 for rider_index, rider in enumerate(riders):
-    power_per_second = interpolate(sim.time, sim.power[rider_index], seconds)
-    cpm = CriticalPowerModel(cp=rider.cp, w_prime=rider.w_prime)
-    w_prime_balance_per_second = cpm.w_prime_balance(power=power_per_second)
-    w_prime_balance = interpolate(seconds, w_prime_balance_per_second, sim.time)
-    plt.plot(sim.time, w_prime_balance, label=rider.name)
+    plt.plot(sim.stage.distance, sim.power[rider_index], label=rider.name)
+
+# seconds = np.arange(0, int(sim.time[-1] + 1))
+# for rider_index, rider in enumerate(riders):
+#     power_per_second = interpolate(sim.time, sim.power[rider_index], seconds)
+#     cpm = CriticalPowerModel(cp=rider.cp, w_prime=rider.w_prime)
+#     w_prime_balance_per_second = cpm.w_prime_balance(power=power_per_second)
+#     w_prime_balance = interpolate(seconds, w_prime_balance_per_second, sim.time)
+#     plt.plot(sim.time, w_prime_balance, label=rider.name)
+
+# plt.legend()
+
+print(f"n_riders finished = {sum([not rider.dropped for rider in sim.riders])}")
+
+plt.subplot(3, 1, 2)
+for rider_index, rider in enumerate(riders):
+    plt.plot(sim.stage.distance, sim.w_prime_remaining[rider_index], label=rider.name)
+
+
+plt.subplot(3, 1, 3)
+plt.plot(sim.stage.distance, sim.stage.elevation)
 
 plt.legend()
 plt.show()

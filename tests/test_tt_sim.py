@@ -5,7 +5,7 @@ from tt_sim.core.rider import Rider, TeamRider
 from tt_sim.core.bike import Bike
 from tt_sim.core.wind import Wind
 from tt_sim.core.stage import Stage, get_default_stage
-from tt_sim.core.simulation import Simulation, TeamSimulation
+from tt_sim.core.simulation import Simulation, TeamSimulation, SimulationWithWPrimeBalance
 
 @pytest.fixture
 def rider():
@@ -53,6 +53,12 @@ def test_team_time_trial(bike, wind, stage):
     sim.solve_velocity_and_time()
     assert abs(sim.time[-1] - 3600) < 1
 
+def test_hour_record_with_w_prime_balance(rider, bike, wind, stage):    
+    power = 440 * np.ones(len(stage.distance))
+    sim = SimulationWithWPrimeBalance(rider=rider, bike=bike, wind=wind, stage=stage, power=power)
+    sim.solve_velocity_and_time()
+    assert abs(sim.time[-1] - 3600) < 1
+
 if __name__ == '__main__':
     import pytest
-    pytest.main()
+    pytest.main([__file__])
